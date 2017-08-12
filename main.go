@@ -1,9 +1,10 @@
 package main
 import (
 //	"fmt"
-	"github.com/gizak/termui"
-
+//	"github.com/gizak/termui"
+	"github.com/marcusolsson/tui-go"
 	"github.com/wargarblgarbl/libgosubs/ass"
+	
 
 )
 
@@ -13,60 +14,115 @@ import (
 func main() {
 	//submem := &ass.Ass{}
 //	load := ass.ParyseAss("./test.ass")
-//	fmt.Print(load)
-	err := termui.Init()
-	if err != nil {
-		panic(err)
-	}
-	defer termui.Close()
-	subtitles := termui.NewTable()
+	//	fmt.Print(load)
 
-	var rows [][]string
-	var text []string
-	fat := 0
-	tfat := 0
+	content := tui.NewTable(0,0)
+	content.SetColumnStretch(0, 1)
+	content.SetColumnStretch(1, 1)
+	content.SetColumnStretch(2, 4)
+	var (
+	//	start = tui.NewLabel("")
+	//	end = tui.NewLabel("")
+		text = tui.NewLabel("")
+	)
+	header := tui.NewTable(0,0)
+	header.SetColumnStretch(0, 1)
+	header.SetColumnStretch(1, 1)
+	header.SetColumnStretch(2, 4)
+	header.AppendRow(
+		tui.NewLabel("Start"),
+		tui.NewLabel("End"),
+		tui.NewLabel("Text"),
+	
+	)
+
+	
+//	content.AppendRow(
+//		tui.NewLabel("Start"),
+//		tui.NewLabel("End"),
+//		tui.NewLabel("Text"),
+		
+//	)
+	
 	load := ass.ParseAss("./test.ass")
 	for _, i := range load.Events.Body {
 	//	label := setChannelLabel(slackChan, false)
-		var row []string
+	/*	content.Append(tui.NewHBox(
+			tui.NewLabel(i.Start+"|"+i.End),
+			tui.NewPadder(1, 0, tui.NewLabel("|")),
+			tui.NewLabel(i.Text),
+			tui.NewSpacer(),
+		))
+*/
+	//	fmt.Println(i)
+		content.AppendRow(
+			
+			tui.NewLabel(i.Start),
+			tui.NewLabel(i.End),
+			tui.NewLabel(i.Text),
+	
+		)
+			//tui.NewHBox(
+//			tui.NewLabel(i.Start),
+//			tui.NewLabel(i.End),
+	
 		
-		row = append(row, i.Start)
-		row = append(row, i.End)
-		text = append(text, i.Text)
-		rows = append(rows, row)
-		text = append(text, "")
-		fatter := len(i.Start) + len(i.End) +9
-		if fat < fatter {
-			fat = fatter
-		}
-		tfatter := len(text)
-		if tfat < tfatter {
-			tfat = tfatter
-		}
 		
 	}
-	subtitles.Rows= rows
-	subtitles.Y = 0
-	subtitles.X = 0
-	subtitles.Width = fat
-	
-	subtitles.Height = len(rows) *2
 
-	contents := termui.NewList()
-	contents.X = fat
-	contents.Items = text
-	contents.Height = subtitles.Height
-	contents.Width = tfat
+
+////////
 
 	
+	input := tui.NewEntry()
+	input.SetFocused(true)
 
+	input.SetSizePolicy(tui.Maximum, tui.Maximum)
 
-	termui.Render(subtitles, contents)
+//	inputBox := tui.NewHBox(input)
+//	inputBox.SetBorder(true)
+//	inputBox.SetFocused(true)
+//	inputBox.SetSizePolicy(0, tui.Maximum)
+	
+	/////
+	
+	textbx := tui.NewGrid(0,0)
+	textbx.SetSizePolicy(tui.Maximum, tui.Maximum)
+
+	textbx.AppendRow(tui.NewLabel("Current Selection:"),text)
+	textbx.SetBorder(true)
+	textbx.SetColumnStretch(0, 1)
+	textbx.SetColumnStretch(1, 1)
+
 
 	
-	
-	termui.Handle("/sys/kbd/q", func(termui.Event) {
-		termui.StopLoop()
+	content.OnItemActivated(func(t *tui.Table) {
+	//.OnSelectionChanged(func(t *tui.Table) {
+		m := load.Events.Body[t.Selected()]
+	//	input.SetSelected(m.Text)
+	//	input.SetFocused(true)
+		text.SetText(m.Text)
+	//	textbx.SetText(m.Text)
 	})
-	termui.Loop()
+
+		
+
+
+
+	content.Select(0)
+	editor := tui.NewVBox(header, content, textbx, input)
+	
+	editor.SetSizePolicy(tui.Expanding, tui.Expanding)
+	root := tui.NewHBox(editor)
+
+
+//	tui.DefaultFocusChain.Set(content, input)
+
+	ui := tui.New(root)
+	
+	ui.SetKeybinding("Esc", func() { ui.Quit() })
+	if err := ui.Run(); err != nil {
+		panic(err)
+	}
+	
 }
