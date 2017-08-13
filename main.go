@@ -1,7 +1,5 @@
 package main
 import (
-//	"fmt"
-//	"github.com/gizak/termui"
 	"github.com/marcusolsson/tui-go"
 	"github.com/wargarblgarbl/libgosubs/ass"
 	
@@ -12,9 +10,6 @@ import (
 
 
 func main() {
-	//submem := &ass.Ass{}
-//	load := ass.ParyseAss("./test.ass")
-	//	fmt.Print(load)
 
 	content := tui.NewTable(0,0)
 	content.SetColumnStretch(0, 1)
@@ -85,24 +80,22 @@ func main() {
 //	inputBox.SetSizePolicy(0, tui.Maximum)
 	
 	/////
-	
+/*	
 	textbx := tui.NewGrid(0,0)
 	textbx.SetSizePolicy(tui.Maximum, tui.Maximum)
 
-	textbx.AppendRow(tui.NewLabel("Current Selection:"),text)
+	textbx.AppendRow(tui.NewLabel(text))
 	textbx.SetBorder(true)
 	textbx.SetColumnStretch(0, 1)
 	textbx.SetColumnStretch(1, 1)
-
+*/
 
 	
 	content.OnItemActivated(func(t *tui.Table) {
 	//.OnSelectionChanged(func(t *tui.Table) {
 		m := load.Events.Body[t.Selected()]
-	//	input.SetSelected(m.Text)
-	//	input.SetFocused(true)
-		text.SetText(m.Text)
-	//	textbx.SetText(m.Text)
+		input.SetText(m.Text)
+		input.SetFocused(true)
 	})
 
 		
@@ -110,10 +103,10 @@ func main() {
 
 
 	content.Select(0)
-	editor := tui.NewVBox(header, content, textbx, input)
+//	editor := tui.NewVBox(header, content, textbx, input)
 	
-	editor.SetSizePolicy(tui.Expanding, tui.Expanding)
-	root := tui.NewHBox(editor)
+//	editor.SetSizePolicy(tui.Expanding, tui.Expanding)
+	root := tui.NewVBox(header, content, input)
 
 
 //	tui.DefaultFocusChain.Set(content, input)
