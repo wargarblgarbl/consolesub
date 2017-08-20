@@ -2,8 +2,6 @@ package main
 import (
 	"github.com/marcusolsson/tui-go"
 	"github.com/wargarblgarbl/libgosubs/ass"
-
-
 )
 
 func main() {
